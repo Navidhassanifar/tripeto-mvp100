@@ -1,16 +1,9 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { TripPreferences, TripPlan } from '../types.ts';
 import { MOCK_FLIGHTS, MOCK_HOTELS, MOCK_ACTIVITIES } from '../data/mockData.ts';
 
-// This is a placeholder for the API key. In a real application, this would be
-// securely managed and not hardcoded.
-const API_KEY = process.env.API_KEY;
-
-if (!API_KEY) {
-  throw new Error("API_KEY environment variable not set.");
-}
-
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const getTripDurationInDays = (startDate: string, endDate: string): number => {
   const start = new Date(startDate);
