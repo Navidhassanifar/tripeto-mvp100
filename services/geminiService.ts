@@ -1,17 +1,13 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { TripPreferences, TripPlan } from '../types.ts';
 import { MOCK_FLIGHTS, MOCK_HOTELS, MOCK_ACTIVITIES } from '../data/mockData.ts';
+import { MOCK_TRIP_PLAN } from '../data/mockTripPlan.ts';
 
 // The execution environment provides the API key via `process.env.API_KEY`.
 const API_KEY = process.env.API_KEY;
 
-if (!API_KEY) {
-  // This error will trigger if the API_KEY is not available in the execution environment.
-  throw new Error("API_KEY environment variable not set. Please ensure it is configured correctly.");
-}
-
-const ai = new GoogleGenAI({ apiKey: API_KEY });
-
+// Conditionally initialize the AI client. If no key, `ai` will be null.
+const ai = API_KEY ? new GoogleGenAI({ apiKey: API_KEY }) : null;
 
 const getTripDurationInDays = (startDate: string, endDate: string): number => {
   const start = new Date(startDate);
@@ -105,6 +101,15 @@ const tripPlanSchema = {
 };
 
 export const generateTripPlan = async (preferences: TripPreferences): Promise<TripPlan> => {
+  // If the AI client wasn't initialized (no API key), return a mock plan.
+  if (!ai) {
+    console.warn("API_KEY not found. Returning mock trip plan for demonstration purposes.");
+    // Simulate a network delay to mimic a real API call
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    // The mock plan doesn't need to be dynamic based on preferences for this demo
+    return MOCK_TRIP_PLAN;
+  }
+  
   const durationDays = getTripDurationInDays(preferences.startDate, preferences.endDate);
   
   const adjustedFlights = applyPricingAdjustments(MOCK_FLIGHTS, preferences.startDate);
